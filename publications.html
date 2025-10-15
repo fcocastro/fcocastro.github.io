@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Publications — Francisco Castro</title>
+  <style>
+    :root{
+      --accent:#0ea5e9; --text:#111827; --muted:#6b7280; --bg:#ffffff; --card:#f9fafb; --radius:12px;
+      --profile-img:url('./assets/me.jpg');
+    }
+    @media (prefers-color-scheme: dark){ :root{ --text:#e5e7eb; --muted:#9ca3af; --bg:#0b1020; --card:#0f172a; --accent:#38bdf8 } }
+    *{box-sizing:border-box}
+    html,body{margin:0; padding:0; background:var(--bg); color:var(--text); font:15px/1.5 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Inter,Helvetica,Arial}
+    a{color:var(--accent); text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    .wrap{max-width:860px; margin:40px auto; padding:0 18px}
+    header{display:flex; align-items:center; justify-content:space-between; margin-bottom:22px}
+    .site-title{font-weight:700; font-size:20px}
+    nav{display:flex; gap:16px}
+
+    /* Section header + toggle (collapsible) */
+    h2{
+      margin:24px 0 10px; font-size:22px; line-height:1.2;
+      padding-left:8px; border-left:4px solid var(--accent);
+      display:flex; align-items:center; gap:10px;
+    }
+    h2 .toggle{
+      appearance:none; background:none; border:0; padding:0; margin:0;
+      font:inherit; color:inherit; cursor:pointer; display:inline-flex; align-items:center; gap:8px;
+    }
+    .caret{ width:14px; height:14px; transition: transform .2s ease; }
+    .pub-sec.collapsed .paper-list{ display:none; }
+    .pub-sec.collapsed h2 .caret{ transform: rotate(-90deg); }
+
+    .subtle{color:var(--muted)}
+
+    :root{ /* Section accent colors */
+      --accent-journal: var(--accent);
+      --accent-conference: #6366f1; /* indigo */
+      --accent-working: #f59e0b;    /* amber */
+      --accent-other: #64748b;      /* slate */
+    }
+
+    /* --- Single-column compact list --- */
+    .paper-list{display:block; counter-reset: paper}
+    .paper{position:relative; padding:10px 12px 8px 40px; margin:8px 0; border-left:3px solid var(--accent); background:transparent; border-radius:0}
+    .paper::before{counter-increment: paper; content: counter(paper); position:absolute; left:8px; top:10px; width:20px; height:20px; border-radius:999px; display:grid; place-items:center; font-weight:700; font-size:12px; color:var(--text); background:var(--card); border:1px solid rgba(0,0,0,.12)}
+    @media (prefers-color-scheme: dark){ .paper::before{border-color:rgba(255,255,255,.18)} }
+    .paper + .paper{border-top:1px solid rgba(0,0,0,.06)}
+    @media (prefers-color-scheme: dark){ .paper + .paper{border-color:rgba(255,255,255,.08)} }
+
+    /* Per-section accent overrides */
+    #journal{ border-left-color: var(--accent-journal) }
+    #journal-papers .paper{ border-left-color: var(--accent-journal) }
+
+    #working{ border-left-color: var(--accent-working) }
+    #working-papers .paper{ border-left-color: var(--accent-working) }
+
+    #conference{ border-left-color: var(--accent-conference) }
+    #conf-papers .paper{ border-left-color: var(--accent-conference) }
+
+    #other{ border-left-color: var(--accent-other) }
+    #other-articles .paper{ border-left-color: var(--accent-other) }
+
+    .title-row{display:flex; align-items:start; gap:10px}
+    .title{font-size:16.5px; font-weight:650; margin:0; line-height:1.25; flex:1}
+
+    .links{display:flex; gap:6px; flex-wrap:wrap; align-items:center; position:relative}
+    .btn{display:inline-flex; align-items:center; gap:6px; padding:3px 7px; border-radius:9px; font-size:12px; border:1px solid rgba(0,0,0,.10); background:#fff0}
+    @media (prefers-color-scheme: dark){ .btn{border-color:rgba(255,255,255,.15)} }
+
+    .meta{display:flex; flex-wrap:wrap; gap:8px; margin:4px 0 0 0; font-size:12.5px; color:var(--muted)}
+    .authors{margin:2px 0 0 0; font-size:12.5px; color:var(--muted)}
+
+    /* Pill + icon alignment */
+    .pill{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:2px 8px; line-height:1; border-radius:999px;
+      border:1px solid rgba(0,0,0,.10);
+    }
+    @media (prefers-color-scheme: dark){ .pill{border-color:rgba(255,255,255,.18)} }
+    .i{width:14px; height:14px; display:inline-block; flex:0 0 auto; vertical-align:middle; transform:translateY(.5px)}
+
+    /* Comment line */
+    .comment{margin:4px 0 0; font-size:12.5px; color:var(--muted); display:flex; align-items:center; gap:6px}
+    .comment .i{width:14px; height:14px}
+
+    /* Abstract */
+    details.abstract{margin-top:6px}
+    details.abstract summary{
+      list-style:none; cursor:pointer; display:inline-flex; align-items:center; gap:8px;
+      user-select:none; color:var(--accent); font-weight:500; font-size:12.5px;
+    }
+    details.abstract summary::-webkit-details-marker{display:none}
+    .chev{width:12px; height:12px; transition:transform .2s ease}
+    details[open] .chev{transform: rotate(90deg)}
+    .abs-body{margin:6px 0 0; font-size:13px}
+
+    /* Masthead */
+    .masthead{display:flex; align-items:center; gap:12px; padding:10px 0 8px; border-bottom:1px solid rgba(0,0,0,.06); margin-bottom:8px}
+    @media (prefers-color-scheme: dark){ .masthead{border-color:rgba(255,255,255,.08)} }
+    .avatar{width:56px; height:56px; border-radius:999px; background:var(--profile-img) center/cover no-repeat; border:1px solid rgba(0,0,0,.12)}
+    @media (prefers-color-scheme: dark){ .avatar{border-color:rgba(255,255,255,.18)} }
+    .page-title{margin:0; font-size:18px; font-weight:750}
+    .page-subtle{margin:2px 0 0 0; color:var(--muted); font-size:13.5px}
+    .head-actions{display:none} /* old 'Show all abstracts' hidden */
+
+    /* Subnav */
+    .subnav{position:sticky; top:0; background:var(--bg); z-index:5; border-bottom:1px solid rgba(0,0,0,.06); padding:8px 0; margin:6px 0 12px}
+    @media (prefers-color-scheme: dark){ .subnav{border-color:rgba(255,255,255,.08)} }
+    .subnav-inner{display:flex; align-items:center; gap:12px; flex-wrap:wrap}
+    .subnav-name{font-weight:700; color:var(--text)}
+    .subnav-links{display:flex; gap:6px; flex-wrap:wrap}
+    .subnav a{display:inline-block; padding:4px 8px; border-radius:8px; font-size:13px; color:var(--muted); border:1px solid transparent}
+    .subnav a:hover{border-color:rgba(0,0,0,.10); text-decoration:none}
+    .subnav a.active{color:var(--text); border-color:rgba(0,0,0,.10); background:rgba(0,0,0,.03)}
+    @media (prefers-color-scheme: dark){ .subnav a.active{background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.18)} }
+    h2{scroll-margin-top:60px}
+
+    /* Cite/Media dropdowns */
+    details.cite, details.media{margin-top:6px}
+    details.cite summary, details.media summary{list-style:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px; user-select:none; color:var(--accent); font-weight:500}
+    details.cite summary::-webkit-details-marker, details.media summary::-webkit-details-marker{display:none}
+    .cite-body{margin:6px 0 0; font-size:12.5px; background:var(--card); border-radius:8px; padding:8px 10px; overflow:auto}
+    .media-list{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px}
+    .media-pill{display:inline-flex; align-items:center; gap:6px; font-size:12px; border:1px solid rgba(0,0,0,.10); padding:3px 7px; border-radius:999px; background:#fff0}
+
+    /* Inline tools */
+    .links details.tool{position:relative; display:inline-block}
+    .links details.tool summary{padding:4px; border-radius:8px; border:1px solid rgba(0,0,0,.10)}
+    @media (prefers-color-scheme: dark){ .links details.tool summary{border-color:rgba(255,255,255,.15)} }
+    .links details.tool .dropdown{display:none; position:absolute; right:0; top:calc(100% + 6px); min-width:320px; max-width:520px; background:var(--card); border:1px solid rgba(0,0,0,.1); border-radius:10px; padding:8px 10px; box-shadow:0 6px 24px rgba(0,0,0,.08); z-index:20}
+    @media (prefers-color-scheme: dark){ .links details.tool .dropdown{border-color:rgba(255,255,255,.15)} }
+    .links details.tool[open] .dropdown{display:block}
+    .links details.cite, .links details.media{margin-top:0}
+    .links .tool .i{width:16px; height:16px}
+
+    /* Dropdown positioning helpers */
+    .links details.tool.align-left .dropdown{right:auto; left:0}
+    .links details.tool.full .dropdown{left:0; right:0; width:auto; max-width:none}
+
+    /* Copy BibTeX button */
+    .copy-row{display:flex; justify-content:flex-end; margin-bottom:6px}
+    .copy-btn{display:inline-flex; align-items:center; gap:6px; padding:3px 8px; border-radius:8px; font-size:12px; border:1px solid rgba(0,0,0,.10); background:#fff0; cursor:pointer}
+    .copy-btn:hover{transform:translateY(-1px)}
+  </style>
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$','$'], ['\\(','\\)']], displayMath: [['$$','$$'], ['\\[','\\]']], processEscapes: true },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="site-title">Francisco Castro</div>
+      <nav>
+        <a href="./index.html">Home</a>
+        <a href="./publications.html" aria-current="page">Publications</a>
+        <!-- <a href="./teaching.html">Teaching</a> -->
+        <a href="./cv.html">CV</a>
+      </nav>
+    </header>
+
+    <section class="masthead" role="region" aria-label="Page header">
+      <div class="avatar" aria-hidden="true"></div>
+      <div>
+        <h1 class="page-title">Publications</h1>
+        <p class="page-subtle">Browse my research: journal papers, conference proceedings, and working papers.</p>
+      </div>
+    </section>
+
+    <nav class="subnav" aria-label="Publications sections">
+      <div class="subnav-inner">
+        <div class="subnav-links">
+          <a href="#journal">Journal Papers</a>
+          <a href="#conference">Conference Proceedings</a>
+          <a href="#working">Working Papers</a>
+          <a href="#other">Other Articles</a>
+        </div>
+      </div>
+    </nav>
+
+    <section class="pub-sec" data-sec="journal">
+      <h2 id="journal">
+        <button class="toggle" aria-expanded="true" aria-controls="journal-papers">
+          <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 9l6 6 6-6"/>
+          </svg>
+          Journal Papers
+        </button>
+      </h2>
+      <div class="paper-list" id="journal-papers">
+
+      <article class="paper" itemscope itemtype="https://schema.org/ScholarlyArticle">
+        <div class="title-row">
+          <h3 class="title" itemprop="headline">Electric Vehicle Fleet and Charging Infrastructure Planning</h3>
+          <div class="links">
+            <a class="btn" href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4482128" itemprop="url">Paper</a>
+            </div>
+        </div>
+        <div class="meta">
+          <span class="pill" title="Year"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> forthcoming</span>
+          <span class="pill" title="Venue">Management Science</span>
+        </div>
+        <div class="authors">with Sushil Mahavir Varma and Siva Theja Maguluri</div>
+        
+        <div class="comment"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H8l-4 4v-4H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Sushil was a finalist in the 2023 TSL Best Student Paper Award</div>
+    
+        
+        <details class="abstract">
+          <summary><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg> Show abstract</summary>
+          <div class="abs-body" itemprop="description">We study electric vehicle (EV) fleet and charging infrastructure planning in a spatial setting. For a centrally managed fleet that serves customer requests arriving continuously at a rate $\lambda$ throughout the day, we determine the minimum number of vehicles and chargers for a target service level, along with matching and charging policies. While non-EV systems require extra $\Theta(\lambda^{2/3})$ vehicles due to pickup times, EV systems differ. Charging increases nominal capacity, enabling pickup time reductions and allowing for an extra fleet requirement of only $\Theta(\lambda^{\nu})$ for $\nu \in (1/2, 2/3]$, depending on charging infrastructure and battery pack sizes. We propose the Power-of-$d$ dispatching policy, which achieves this performance by selecting the closest vehicle with the highest battery level from $d$ options. We extend our results to accommodate time-varying demand patterns and discuss conditions for transitioning between EV and non-EV capacity planning. Simulations verify our scaling results, insights, and policy effectiveness. While long-range, fast-charging fleets resemble non-EV systems, short-range, low-cost fleets can still perform competitively---underscoring the need for EV-aware management policies.</div>
+        </details>
+      </article>
+
+      <article class="paper" itemscope itemtype="https://schema.org/ScholarlyArticle">
+        <div class="title-row">
+          <h3 class="title" itemprop="headline">Power-of-d Choices Load Balancing in the Sub-Halfin Whitt Regime</h3>
+          <div class="links">
+            <a class="btn" href="https://arxiv.org/abs/2208.07539" itemprop="url">Paper</a>
+            </div>
+        </div>
+        <div class="meta">
+          <span class="pill" title="Year"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> forthcoming</span>
+          <span class="pill" title="Venue">Stochastic Systems</span>
+        </div>
+        <div class="authors">with Sushil Mahavir Varma and Siva Theja Maguluri</div>
+        
+        
+        <details class="abstract">
+          <summary><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg> Show abstract</summary>
+          <div class="abs-body" itemprop="description">We consider the load balancing system under Poisson arrivals, exponential services, and homogeneous servers. Upon arrival, a job is to be routed to one of the servers, where it is queued until service. We consider the Power-of-$d$ choices routing algorithm, which chooses the queue with minimum length among $d$ randomly sampled queues. We study this system in the many-server heavy-traffic regime where the number of servers goes to infinity simultaneously when the load approaches the capacity. In particular, we consider a sequence of systems with $n$ servers, where the arrival rate of the $n^{\text{th}}$ system is $\lambda=n-n^{1-\gamma}$ for some $\gamma \in (0, 0.5)$, known as the sub-Halfin-Whitt regime. It was shown by [Liu Ying (2020)] that under Power-of-$d$ choices routing with $d \geq n^\gamma \log n$, the queue length behaves similarly to that of JSQ and that there are asymptotically zero queueing delays. 
+
+The focus of this paper is to characterize the behavior when $d$ is below this threshold. We obtain high probability bounds on the queue lengths for various values of $d$ and large enough $n$. In particular, we show that when $d$ grows polynomially in $n$ but slower than in [Liu Ying (2020)], i.e., if $d$ is $\Theta\left((n^\gamma\log n)^{1/m})\right)$ for some integer $m&gt;1$, then the asymptotic queue length is $m$ with high probability. This finite queue length behavior is similar to JSQ in the so-called nondegenerate slowdown regime (where $\gamma=1$). Moreover, if $d$ grows polylog in $n$, i.e., slower than any polynomial, but is at least $\Omega(\log (n)^3)$, the queue length blows up to infinity asymptotically. Such behavior is similar to that under JSQ in the so-called super slowdown regime ($\gamma&gt;1$). We obtain these results by using an iterative state space collapse approach. We first establish a weak state-space collapse (SSC) on the queue lengths. Then, we bootstrap on weak SSC to iteratively narrow down the region of the collapse. After enough steps, this inductive refinement provides the bounds we seek. We establish these sequences of collapse using Lyapunov drift arguments.</div>
+        </details>
+      </article>
+
+      <article class="paper" itemscope itemtype="https://schema.org/ScholarlyArticle">
+        <div class="title-row">
+          <h3 class="title" itemprop="headline">Idle wage as a tool to regulate the relationship between ride-hailing platforms and drivers</h3>
+          <div class="links">
+            <a class="btn" href="https://doi.org/10.1016/j.trc.2025.105113">DOI</a>
+            </div>
+        </div>
+        <div class="meta">
+          <span class="pill" title="Year"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 2025</span>
+          <span class="pill" title="Venue">Transportation Research Part C: Emerging Technologies</span>
+        </div>
+        <div class="authors">with Andres Fielbaum, David Salas, and Ruilin Zhang</div>
+        
+        
+        <details class="abstract">
+          <summary><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg> Show abstract</summary>
+          <div class="abs-body" itemprop="description">Ride-hailing platforms typically classify drivers as either employees or independent contractors. These classifications tend to emphasise either wage certainty or flexibility, but rarely both. We study an alternative or complementary approach: the Idle wage, i.e., a form of payment to the drivers while they are not necessarily transporting passengers, but waiting to be assigned or en-route to pickup a new user. We adapt a well-known economic model of the supply-demand equilibrium in ride-hailing platforms and analyse how the optimal welfare and profit change with the introduction of an Idle wage when drivers are risk-averse. Risk-aversion plays a role, because the Idle wage will always be paid, whereas traditional payments (that still exist in our model) have a random component, namely how many users a driver is assigned to. We show that in a single-period setting, risk aversion implies that it is optimal to pay as much as possible via the Idle wage. However, if the pool of available drivers is large, even a small Idle wage could attract too many drivers, rendering the system unprofitable. When the demand fluctuates throughout multiple periods, we show that if the Idle wage has to be constant, then it is optimal to combine the Idle wage with the traditional payment via trips, so that surge pricing influences the number of drivers connected. This illustrates a relevant trade-off: Risk-aversion favours using the Idle wage to attract drivers; however, if the platform is not allowed to fully adjust the Idle wage over time, there may be periods in which the Idle wage cannot resolve the mismatch between supply and demand. We propose a partially flexible constraint that still relies as much as possible on the Idle wage. It allows the Idle wage to adapt per period, as long as it fulfils a total minimum wage requirement. Numerical simulations suggest that the Idle wage policy, if properly implemented, could be beneficial for the system as a whole.</div>
+        </details>
+      </article>
+
+      <article class="paper" itemscope itemtype="https://schema.org/ScholarlyArticle">
+        <div class="title-row">
+          <h3 class="title" itemprop="headline">Getting Out of Your Own Way: Introducing Autonomous Vehicles on a Ride-Hailing Platform</h3>
+          <div class="links">
+            <a class="btn" href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3912137" itemprop="url">Paper</a>
+            <a class="btn" href="https://doi.org/10.1177/10591478241264796">DOI</a>
+            </div>
+        </div>
+        <div class="meta">
+          <span class="pill" title="Year"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 2024</span>
+          <span class="pill" title="Venue">Production and Operations Management</span>
+        </div>
+        <div class="authors">with Andrew Frazelle</div>
+        
+        
+        <details class="abstract">
+          <summary><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg> Show abstract</summary>
+          <div class="abs-body" itemprop="description">Once autonomous vehicles (AVs) are deployed for ride-hailing platforms, human drivers will compete with AVs until AV costs decrease enough to eliminate human drivers entirely. We examine a ride-hailing platform&#x27;s strategy to recruit human drivers while operating a private AV fleet. Using a game-theoretic model, we analyze how the platform sets the human-driver wage and the size of its AV fleet. We show that setting a higher wage can surprisingly lead to less human-driver participation. Moreover, we show that having the option to augment its AV fleet after observing human participation levels can, counterintuitively, hurt the platform&#x27;s bottom line. Our findings emphasize the need for ride-hailing platforms to carefully navigate the complex interactions between their roles as supply providers (of AV-served rides) and supply seekers (of human drivers), as failure to do so can be costly.</div>
+        </details>
+      </article>
+
+      <article class="paper" itemscope itemtype="https://schema.org/ScholarlyArticle">
+        <div class="title-row">
+          <h3 class="title" itemprop="headline">Mechanism Design under Approximate Incentive Compatibility</h3>
+          <div class="links">
+            <a class="btn" href="https://arxiv.org/abs/2103.03403" itemprop="url">Paper</a>
+            <a class="btn" href="https://doi.org/10.1287/opre.2022.2359">DOI</a>
+            </div>
+        </div>
+        <div class="meta">
+          <span class="pill" title="Year"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 2022</span>
+          <span class="pill" title="Venue">Operations Research</span>
+        </div>
+        <div class="authors">with Santiago Balseiro and Omar Besbes</div>
+        
+        
+        <details class="abstract">
+          <summary><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg> Show abstract</summary>
+          <div class="abs-body" itemprop="description">A fundamental assumption in classical mechanism design is that buyers are perfect optimizers. However, in practice, buyers may be limited by their computational capabilities or a lack of information and may not be able to perfectly optimize their response to a mechanism. This has motivated the introduction of approximate incentive compatibility (IC) as an appealing solution concept for practical mechanism design. Although most of the literature has focused on the analysis of particular approximate IC mechanisms, this paper is the first to study the design of optimal mechanisms in the space of approximate IC mechanisms and to explore how much revenue can be garnered by moving from exact to approximate incentive constraints. In particular, we study the problem of a seller facing one buyer with private values and analyze optimal selling mechanisms under $\varepsilon$-incentive compatibility. We establish that the gains that can be garnered depend on the local curvature of the seller&#x27;s revenue function around the optimal posted price when the buyer is a perfect optimizer. If the revenue function behaves locally like an $\alpha$-power for $\alpha\in (0,\infty)$, then no mechanism can garner gains higher than order $\varepsilon^{\alpha/(2\alpha-1)}$. This improves on state-of-the-art results that imply maximum gains of $\varepsilon^{1/2}$ by providing the first parametric bounds that capture the impact of revenue function&#x27;s curvature on revenue gains. Furthermore, we establish that an optimal mechanism needs to randomize as soon as $\varepsilon&gt;0$ and construct a randomized mechanism that is guaranteed to achieve order $\varepsilon^{\alpha/(2\alpha-1)}$ additional revenues, leading to a tight characterization of the revenue implications of approximate IC constraints. Our study sheds light on a novel class of optimization problems and the challenges that emerge when relaxing IC constraints. In particular, it brings forward the need to optimize not only over allocations and payments but also over best responses, and we develop a new framework to address this challenge.</div>
+        </details>
+      </article>
+
+      <article class="paper" itemscope itemtype="https://schema.org/ScholarlyArticle">
+        <div class="title-row">
+          <h3 class="title" itemprop="headline">Spatial Capacity Planning</h3>
+          <div class="links">
+            <a class="btn" href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3292651" itemprop="url">Paper</a>
+            <a class="btn" href="https://doi.org/10.1287/opre.2021.2112">DOI</a>
+            <details class="tool cite"><summary class="btn" aria-label="Cite this paper"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16l4-4h6a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/></svg><span>Cite</span></summary><div class="dropdown cite-body"><pre><code>@article{besbes2022spatial,
+  title={Spatial capacity planning},
+  author={Besbes, Omar and Castro, Francisco and Lobel, Ilan},
+  journal={Operations Research},
+  volume={70},
+  number={2},
+  pages={1271--1291},
+  year={2022},
+  publisher={INFORMS}
+}</code></pre></div></details>
+            </div>
+        </div>
+        <div class="meta">
+          <span class="pill" title="Year"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 2022</span>
+          <span class="pill" title="Venue">Operations Research</span>
+        </div>
+        <div class="authors">with Omar Besbes and Ilan Lobel</div>
+        
+        
+        <details class="abstract">
+          <summary><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg> Show abstract</summary>
+          <div class="abs-body" itemprop="description">We study the relationship between capacity and performance for a service firm with spatial operations, in the sense that requests arrive with origin-destination pairs. An example of such a system is a ride-hailing platform in which each customer arrives in the system with the need to travel from an origin to a destination. We propose a parsimonious representation of a spatial multiserver system through a state-dependent queueing model that captures spatial frictions as well as spatial economies of scale through the service rate. In a classical $M/M/n$ queueing model, the square root safety (SRS) staffing rule is known to balance server utilization and customer wait times. By contrast, we find that the SRS rule does not lead to such a balance in spatial systems. In a spatial environment, pick-up times increase the load in the system; furthermore, they are an endogenous source of extra workload that leads the system to only operate efficiently if there is sufficient imbalance between supply and demand. In heavy traffic, we derive the mapping from load to operating regimes and establish implications on various metrics of interest. In particular, to obtain a balance of utilization and wait times, the service firm should use a higher safety factor, proportional to the offered load to the power of $2/3$ . We also discuss implications of these results for general systems.</div>
+        </details>
+      </article>
+
+      <article class="paper" itemscope itemtype="https://schema.org/ScholarlyArticle">
+        <div class="title-row">
+          <h3 class="title" itemprop="headline">Third-Degree Price Discrimination Versus Uniform Pricing</h3>
+          <div class="links">
+            <a class="btn" href="https://arxiv.org/abs/1912.05164" itemprop="url">Paper</a>
+            <a class="btn" href="https://doi.org/10.1016/j.geb.2021.11.008">DOI</a>
+            </div>
+        </div>
+        <div class="meta">
+          <span class="pill" title="Year"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 2022</span>
+          <span class="pill" title="Venue">Games and Economic Behavior</span>
+        </div>
+        <div class="authors">with Dirk Bergemann and Gabriel Weintraub</div>
+        
+        
+        <details class="abstract">
+          <summary><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg> Show abstract</summary>
+          <div class="abs-body" itemprop="description">We compare the profit of the optimal third-degree price discrimination policy against a uniform pricing policy. A uniform pricing policy offers the same price to all segments of the market. Our main result establishes that for a broad class of third-degree price discrimination problems with concave profit functions (in the price space) and common support, a uniform price is guaranteed to achieve one half of the optimal monopoly profits. This profit bound holds for any number of segments and prices that the seller might use under third-degree price discrimination. We establish that these conditions are tight and that weakening either common support or concavity can lead to arbitrarily poor profit comparisons even for regular or monotone hazard rate distributions.</div>
+        </details>
+      </article>
+
+      <article class="paper" itemscope itemtype="https://schema.org/ScholarlyArticle">
+        <div class="title-row">
+          <h3 class="title" itemprop="headline">Surge Pricing and its Spatial Supply Response</h3>
+          <div class="links">
+            <a class="btn" href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3124571" itemprop="url">Paper</a>
+            <a class="btn" href="https://doi.org/10.1287/mnsc.2020.3622">DOI</a>
+            <details class="tool media"><summary class="btn" aria-label="Media coverage"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h10l6 6v8a2 2 0 0 1-2 2z"/></svg><span>Media</span></summary><div class="dropdown"><div class="media-list"><a class="media-pill" href="https://www.informs.org/Blogs/ManSci-Blogs/Management-Science-Review/Surge-Pricing-and-Its-Spatial-Supply-Response" rel="noopener">ManSci Blogs</a><a class="media-pill" href="https://anderson-review.ucla.edu/a-proposal-to-improve-surge-pricing/" rel="noopener">UCLA Anderson Review</a></div></div></details>
+            </div>
+        </div>
+        <div class="meta">
+          <span class="pill" title="Year"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 2021</span>
+          <span class="pill" title="Venue">Management Science</span>
+        </div>
+        <div class="authors">with Omar Besbes and Ilan Lobel</div>
+        
+        
+        <details class="abstract">
+          <summary><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg> Show abstract</summary>
+          <div class="abs-body" itemprop="description">We consider the pricing problem faced by a revenue-maximizing platform matching price-sensitive customers to flexible supply units within a geographic area. This can be interpreted as the problem faced in the short term by a ride-hailing platform. We propose a two-dimensional framework in which a platform selects prices for different locations and drivers respond by choosing where to relocate, in equilibrium, based on prices, travel costs, and driver congestion levels. The platform&#x27;s problem is an infinite-dimensional optimization problem with equilibrium constraints. We elucidate structural properties of supply equilibria and the corresponding utilities that emerge and establish a form of spatial decomposition, which allows us to localize the analysis to regions of movement. In turn, uncovering an appropriate knapsack structure to the platform&#x27;s problem, we establish a crisp local characterization of the optimal prices and the corresponding supply response. In the optimal solution, the platform applies different treatments to different locations. In some locations, prices are set so that supply and demand are perfectly matched; overcongestion is induced in other locations, and some less profitable locations are indirectly priced out. To obtain insights on the global structure of an optimal solution, we derive in quasi-closed form the optimal solution for a family of models characterized by a demand shock. The optimal solution, although better balancing supply and demand around the shock, quite interestingly also ends up inducing movement away from it.</div>
+        </details>
+      </article>
+
+      <article class="paper" itemscope itemtype="https://schema.org/ScholarlyArticle">
+        <div class="title-row">
+          <h3 class="title" itemprop="headline">Matching Queues with Reneging: a Product Form Solution</h3>
+          <div class="links">
+            <a class="btn" href="https://arxiv.org/abs/2005.10728" itemprop="url">Paper</a>
+            <a class="btn" href="https://doi.org/10.1007/s11134-020-09662-y">DOI</a>
+            </div>
+        </div>
+        <div class="meta">
+          <span class="pill" title="Year"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 2020</span>
+          <span class="pill" title="Venue">Queueing Systems</span>
+        </div>
+        <div class="authors">with Hamid Nazerzadeh and Chiwei Yan</div>
+        
+        
+        <details class="abstract">
+          <summary><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg> Show abstract</summary>
+          <div class="abs-body" itemprop="description">Motivated by growing applications in two-sided markets, we study a parallel matching queue with reneging. Demand and supply units arrive to the system and are matched in an FCFS manner according to a compatibility graph specified by an N-system. If they cannot be matched upon arrival, they queue and may abandon the system as time goes by. We derive explicit product forms of the steady-state distributions of this system by identifying a partial balance condition.</div>
+        </details>
+      </article>
+
+      <article class="paper" itemscope itemtype="https://schema.org/ScholarlyArticle">
+        <div class="title-row">
+          <h3 class="title" itemprop="headline">The Scope of Sequential Screening with Ex-post Participation Constraints</h3>
+          <div class="links">
+            <a class="btn" href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3569697" itemprop="url">Paper</a>
+            <a class="btn" href="https://doi.org/10.1016/j.jet.2020.105055">DOI</a>
+            </div>
+        </div>
+        <div class="meta">
+          <span class="pill" title="Year"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 2020</span>
+          <span class="pill" title="Venue">Journal of Economic Theory</span>
+        </div>
+        <div class="authors">with Dirk Bergemann and Gabriel Weintraub</div>
+        
+        
+        <details class="abstract">
+          <summary><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg> Show abstract</summary>
+          <div class="abs-body" itemprop="description">We study the classic sequential screening problem in the presence of ex post participation constraints. We establish necessary and sufficient conditions that determine when the optimal selling mechanism is either static or sequential. In the static contract, the buyers are not screened with respect to their interim type and the object is sold at a posted price. In the sequential contract, the buyers are screened with respect to their interim type and a menu of quantities is offered. We completely characterize the optimal sequential contract with binary interim types and a continuum of ex post values. Importantly, the optimal sequential contract randomizes the allocation of the low-type buyer and awards a deterministic allocation to the high type buyer. Finally, we provide additional results for the case of multiple interim types.</div>
+        </details>
+      </article>
+      </div>
+    </section>
+
+
+
+    <section class="pub-sec" data-sec="conference">
+      <h2 id="conference">
+        <button class="toggle" aria-expanded="true" aria-controls="conf-papers">
+          <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 9l6 6 6-6"/>
+          </svg>
+          Conference Proceedings
+        </button>
+      </h2>
+      <div class="paper-list" id="conf-papers">
+
+      <article class="paper" itemscope itemtype="https://schema.org/ScholarlyArticle">
+        <div class="title-row">
+          <h3 class="title" itemprop="headline">Optimal Design of Default Donations</h3>
+          <div class="links">
+            <a class="btn" href="https://dl.acm.org/doi/10.1145/3670865.3673464">DOI</a>
+            </div>
+        </div>
+        <div class="meta">
+          <span class="pill" title="Year"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 2024</span>
+          <span class="pill" title="Venue">ACM Conference on Economics and Computation</span>
+        </div>
+        <div class="authors">with Scott Rodilitz</div>
+        
+        
+        <details class="abstract">
+          <summary><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg> Show abstract</summary>
+          <div class="abs-body" itemprop="description">Nonprofit fundraising websites often display a set of suggested donation amounts, allowing prospective donors to effortlessly select an amount from this menu of suggestions instead of manually inputting their ideal donation. Although this strategy is effective at shaping behavior, it can also backfire: suggested amounts attract donors with both lower and higher ideal donations, potentially leading to a net decrease in revenue. To address this challenge, we present a comprehensive framework for designing a menu of suggestions to maximize fundraising revenue in the presence of heterogeneous donors. Our analysis reveals the limitations of a greedy approach. Instead, we design an algorithm based on dynamic programming principles that efficiently finds an optimal menu. Additionally, we shed light on the value of information by comparing against a benchmark that knows the largest amount that each donor would select. If the nonprofit has information about each donor&#x27;s ideal donation, it can obtain a constant-factor guarantee with respect to this full-information benchmark. If the nonprofit only has distributional information, we characterize how the guarantee depends on donor heterogeneity and the size of the menu. Our algorithm is a readily-implementable tool for nonprofits, and our theoretical findings translate into guidelines for the design of fundraising websites: (i) market segmentation can be quite valuable, (ii) larger menus can serve as a partial substitute for segmentation, and (iii) menus that include suggested amounts below the most common donation are often suboptimal. As a case study, we apply our optimization framework to experimental data from Altmann et al. (2019). Our counterfactual analysis suggests that the optimal menu could increase revenue by more than 3%.</div>
+        </details>
+      </article>
+
+      <article class="paper" itemscope itemtype="https://schema.org/ScholarlyArticle">
+        <div class="title-row">
+          <h3 class="title" itemprop="headline">Human-AI Interactions and Societal Pitfalls</h3>
+          <div class="links">
+            <a class="btn" href="https://dl.acm.org/doi/10.1145/3670865.3673482">DOI</a>
+            <details class="tool media"><summary class="btn" aria-label="Media coverage"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h10l6 6v8a2 2 0 0 1-2 2z"/></svg><span>Media</span></summary><div class="dropdown"><div class="media-list"><a class="media-pill" href="https://anderson-review.ucla.edu/ai-from-ai-a-future-of-generic-and-biased-online-content/" rel="noopener">UCLA Anderson Review</a><a class="media-pill" href="https://insight.kellogg.northwestern.edu/article/trade-off-generative-ai" rel="noopener">KellogInsight</a><a class="media-pill" href="https://www.wsj.com/tech/ai/ai-chatbots-feedback-results-fa549914" rel="noopener">WSJ</a></div></div></details>
+            </div>
+        </div>
+        <div class="meta">
+          <span class="pill" title="Year"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 2024</span>
+          <span class="pill" title="Venue">ACM Conference on Economics and Computation</span>
+        </div>
+        <div class="authors">with Jian Gao and Sébastien Martin</div>
+        
+        
+        <details class="abstract">
+          <summary><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg> Show abstract</summary>
+          <div class="abs-body" itemprop="description">When working with generative artificial intelligence (AI), users may see productivity gains, but the AI-generated content may not match their preferences exactly. To study this effect, we introduce a Bayesian framework in which heterogeneous users choose how much information to share with the AI, facing a trade-off between output fidelity and communication cost. We show that the interplay between these individual-level decisions and AI training may lead to societal challenges. Outputs may become more homogenized, especially when the AI is trained on AI-generated content, potentially triggering a homogenization death spiral. And any AI bias may propagate to become societal bias. A solution to the homogenization and bias issues is to reduce human-AI interaction frictions and enable users to flexibly share information, leading to personalized outputs without sacrificing productivity.</div>
+        </details>
+      </article>
+
+      <article class="paper" itemscope itemtype="https://schema.org/ScholarlyArticle">
+        <div class="title-row">
+          <h3 class="title" itemprop="headline">Power-of-d Choices Load Balancing in the Sub-Halfin Whitt Regime</h3>
+          <div class="links">
+            <a class="btn" href="https://doi.org/10.1145/3578338.3593564">DOI</a>
+            <details class="tool cite"><summary class="btn" aria-label="Cite this paper"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16l4-4h6a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/></svg><span>Cite</span></summary><div class="dropdown cite-body"><pre><code>@inproceedings{10.1145/3578338.3593564,
+author = {Varma, Sushil Mahavir and Castro, Francisco and Maguluri, Siva Theja},
+title = {Power-of-d Choices Load Balancing in the Sub-Halfin Whitt Regime},
+year = {2023},
+isbn = {9798400700743},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3578338.3593564},
+doi = {10.1145/3578338.3593564},
+booktitle = {Abstract Proceedings of the 2023 ACM SIGMETRICS International Conference on Measurement and Modeling of Computer Systems},
+pages = {95–96},
+numpages = {2},
+keywords = {delay, drift method, iterative state space collapse, steady state},
+location = {Orlando, Florida, United States},
+series = {SIGMETRICS &#x27;23}
+}</code></pre></div></details>
+            </div>
+        </div>
+        <div class="meta">
+          <span class="pill" title="Year"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 2023</span>
+          <span class="pill" title="Venue">ACM SIGMETRICS</span>
+        </div>
+        <div class="authors">with Sushil Mahavir Varma and Siva Theja Maguluri</div>
+        
+        
+        <details class="abstract">
+          <summary><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg> Show abstract</summary>
+          <div class="abs-body" itemprop="description">We consider the load balancing system under Poisson arrivals, exponential services, and homogeneous servers. Upon arrival, a job is to be routed to one of the servers, where it is queued until service. We consider the Power-of-$d$ choices routing algorithm, which chooses the queue with minimum length among $d$ randomly sampled queues. We study this system in the many-server heavy-traffic regime where the number of servers goes to infinity simultaneously when the load approaches the capacity. In particular, we consider a sequence of systems with $n$ servers, where the arrival rate of the $n^{\text{th}}$ system is $\lambda=n-n^{1-\gamma}$ for some $\gamma \in (0, 0.5)$, known as the sub-Halfin-Whitt regime. It was shown by [Liu Ying (2020)] that under Power-of-$d$ choices routing with $d \geq n^\gamma \log n$, the queue length behaves similarly to that of JSQ and that there are asymptotically zero queueing delays. 
+
+The focus of this paper is to characterize the behavior when $d$ is below this threshold. We obtain high probability bounds on the queue lengths for various values of $d$ and large enough $n$. In particular, we show that when $d$ grows polynomially in $n$ but slower than in [Liu Ying (2020)], i.e., if $d$ is $\Theta\left((n^\gamma\log n)^{1/m})\right)$ for some integer $m&gt;1$, then the asymptotic queue length is $m$ with high probability. This finite queue length behavior is similar to JSQ in the so-called nondegenerate slowdown regime (where $\gamma=1$). Moreover, if $d$ grows polylog in $n$, i.e., slower than any polynomial, but is at least $\Omega(\log (n)^3)$, the queue length blows up to infinity asymptotically. Such behavior is similar to that under JSQ in the so-called super slowdown regime ($\gamma&gt;1$). We obtain these results by using an iterative state space collapse approach. We first establish a weak state-space collapse (SSC) on the queue lengths. Then, we bootstrap on weak SSC to iteratively narrow down the region of the collapse. After enough steps, this inductive refinement provides the bounds we seek. We establish these sequences of collapse using Lyapunov drift arguments.</div>
+        </details>
+      </article>
+
+      <article class="paper" itemscope itemtype="https://schema.org/ScholarlyArticle">
+        <div class="title-row">
+          <h3 class="title" itemprop="headline">Randomized FIFO Mechanisms</h3>
+          <div class="links">
+            </div>
+        </div>
+        <div class="meta">
+          <span class="pill" title="Year"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 2022</span>
+          <span class="pill" title="Venue">ACM Conference on Economics and Computation</span>
+        </div>
+        <div class="authors">with Hongyao Ma, Hamid Nazerzadeh and Chiwei Yan</div>
+        
+        
+        <details class="abstract">
+          <summary><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg> Show abstract</summary>
+          <div class="abs-body" itemprop="description">We study the matching of jobs to workers in a queue, e.g. a ridesharing platform dispatching drivers to pick up riders at an airport. Under FIFO dispatching, the heterogeneity in trip earnings incentivizes drivers to cherry-pick, increasing riders&#x27; waiting time for a match and resulting in a loss of efficiency and reliability. We first present the direct FIFO mechanism, which offers lower-earning trips to drivers further down the queue. The option to skip the rest of the line incentivizes drivers to accept all dispatches, but the mechanism would be considered unfair since drivers closer to the head of the queue may have lower priority for trips to certain destinations. To avoid the use of unfair dispatch rules, we introduce a family of randomized FIFO mechanisms, which send declined trips gradually down the queue in a randomized manner. We prove that a randomized FIFO mechanism achieves the first best throughput and the second best revenue in equilibrium. Extensive counterfactual simulations using data from the City of Chicago demonstrate substantial improvements of revenue and throughput, highlighting the effectiveness of using waiting times to align incentives and reduce the variability in driver earnings.</div>
+        </details>
+      </article>
+
+      <article class="paper" itemscope itemtype="https://schema.org/ScholarlyArticle">
+        <div class="title-row">
+          <h3 class="title" itemprop="headline">Dynamic Pricing and Matching for Two-Sided Markets with Strategic Servers</h3>
+          <div class="links">
+            <a class="btn" href="https://doi.org/10.1145/3410220.3456272">DOI</a>
+            </div>
+        </div>
+        <div class="meta">
+          <span class="pill" title="Year"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 2021</span>
+          <span class="pill" title="Venue">ACM SIGMETRICS</span>
+        </div>
+        <div class="authors">with Sushil Mahavir Varma and Siva Theja Maguluri</div>
+        
+        
+        <details class="abstract">
+          <summary><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg> Show abstract</summary>
+          <div class="abs-body" itemprop="description">Motivated by applications in online marketplaces such as ride-hailing, we study how strategic servers impact the system performance. We consider a discrete-time process in which, heterogeneous types of customers and servers arrive. Each customer joins their type&#x27;s queue, while servers might join a different type&#x27;s queue depending on the prices posted by the system operator and an inconvenience cost. Then the system operator, constrained by a compatibility graph, decides the matching. The objective is to design an optimal control (pricing and matching scheme) to maximize the profit minus the expected waiting times. We develop a general framework that enables us to analyze a broad range of strategic behaviors. In particular, we encode servers&#x27; behavior in a properly defined <em>cost function</em> that can be tailored to various settings. Using this general cost function, we introduce a novel probabilistic fluid problem. The probabilistic fluid model provides an upper bound on the achievable net profit. We then study the system under a large market regime in which the arrival rates are scaled by $\eta$ and present a probabilistic two-price policy and a max-weight matching policy which results in a net profit-loss of at most $O(\eta^{1/3})$. In addition, under a broad class of customer pricing policies, we show that any matching policy has net profit-loss of at least $\Omega(\eta^{1/3})$. To show generality of our framework, we present multiple extensions to our model and analysis. We conclude the discussion by presenting numerical simulations comparing different cost models and analyzing performance of the proposed pricing and matching policies.</div>
+        </details>
+      </article>
+
+      <article class="paper" itemscope itemtype="https://schema.org/ScholarlyArticle">
+        <div class="title-row">
+          <h3 class="title" itemprop="headline">Spatial Capacity Planning</h3>
+          <div class="links">
+            <a class="btn" href="https://doi.org/10.1145/3328526.3329614">DOI</a>
+            </div>
+        </div>
+        <div class="meta">
+          <span class="pill" title="Year"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 2019</span>
+          <span class="pill" title="Venue">ACM Conference on Economics and Computation</span>
+        </div>
+        <div class="authors">with Omar Besbes and Ilan Lobel</div>
+        
+        
+        <details class="abstract">
+          <summary><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg> Show abstract</summary>
+          <div class="abs-body" itemprop="description">We study the relationship between capacity and performance for a service firm with spatial operations, in the sense that requests arrive with origin-destination pairs. An example of such a system is a ride-hailing platform in which each customer arrives in the system with the need to travel from an origin to a destination. We propose a parsimonious representation of a spatial multiserver system through a state-dependent queueing model that captures spatial frictions as well as spatial economies of scale through the service rate. In a classical $M/M/n$ queueing model, the square root safety (SRS) staffing rule is known to balance server utilization and customer wait times. By contrast, we find that the SRS rule does not lead to such a balance in spatial systems. In a spatial environment, pick-up times increase the load in the system; furthermore, they are an endogenous source of extra workload that leads the system to only operate efficiently if there is sufficient imbalance between supply and demand. In heavy traffic, we derive the mapping from load to operating regimes and establish implications on various metrics of interest. In particular, to obtain a balance of utilization and wait times, the service firm should use a higher safety factor, proportional to the offered load to the power of $2/3$ . We also discuss implications of these results for general systems.</div>
+        </details>
+      </article>
+
+      <article class="paper" itemscope itemtype="https://schema.org/ScholarlyArticle">
+        <div class="title-row">
+          <h3 class="title" itemprop="headline">The Scope of Sequential Screening with Ex-post Participation Constraints</h3>
+          <div class="links">
+            <a class="btn" href="https://dl.acm.org/doi/10.1145/3033274.3085102">DOI</a>
+            </div>
+        </div>
+        <div class="meta">
+          <span class="pill" title="Year"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 2017</span>
+          <span class="pill" title="Venue">ACM Conference on Economics and Computation</span>
+        </div>
+        <div class="authors">with Dirk Bergemann and Gabriel Weintraub</div>
+        
+        
+        <details class="abstract">
+          <summary><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg> Show abstract</summary>
+          <div class="abs-body" itemprop="description">We study the classic sequential screening problem in the presence of ex post participation constraints. We establish necessary and sufficient conditions that determine when the optimal selling mechanism is either static or sequential. In the static contract, the buyers are not screened with respect to their interim type and the object is sold at a posted price. In the sequential contract, the buyers are screened with respect to their interim type and a menu of quantities is offered. We completely characterize the optimal sequential contract with binary interim types and a continuum of ex post values. Importantly, the optimal sequential contract randomizes the allocation of the low-type buyer and awards a deterministic allocation to the high type buyer. Finally, we provide additional results for the case of multiple interim types.</div>
+        </details>
+      </article>
+      </div>
+    </section>
+
+    <section class="pub-sec" data-sec="working">
+      <h2 id="working">
+        <button class="toggle" aria-expanded="true" aria-controls="working-papers">
+          <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 9l6 6 6-6"/>
+          </svg>
+          Working Papers
+        </button>
+      </h2>
+      <div class="paper-list" id="working-papers">
+
+      <article class="paper" itemscope itemtype="https://schema.org/ScholarlyArticle">
+        <div class="title-row">
+          <h3 class="title" itemprop="headline">Human-AI Interactions and Societal Pitfalls</h3>
+          <div class="links">
+            <a class="btn" href="https://arxiv.org/abs/2309.10448" itemprop="url">Paper</a>
+            <details class="tool media"><summary class="btn" aria-label="Media coverage"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h10l6 6v8a2 2 0 0 1-2 2z"/></svg><span>Media</span></summary><div class="dropdown"><div class="media-list"><a class="media-pill" href="https://anderson-review.ucla.edu/ai-from-ai-a-future-of-generic-and-biased-online-content/" rel="noopener">UCLA Anderson Review</a><a class="media-pill" href="https://insight.kellogg.northwestern.edu/article/trade-off-generative-ai" rel="noopener">KellogInsight</a><a class="media-pill" href="https://www.wsj.com/tech/ai/ai-chatbots-feedback-results-fa549914" rel="noopener">WSJ</a></div></div></details>
+            </div>
+        </div>
+        <div class="meta">
+          
+        </div>
+        <div class="authors">with Jian Gao and Sébastien Martin</div>
+        
+        
+        <details class="abstract">
+          <summary><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg> Show abstract</summary>
+          <div class="abs-body" itemprop="description">When working with generative artificial intelligence (AI), users may see productivity gains, but the AI-generated content may not match their preferences exactly. To study this effect, we introduce a Bayesian framework in which heterogeneous users choose how much information to share with the AI, facing a trade-off between output fidelity and communication cost. We show that the interplay between these individual-level decisions and AI training may lead to societal challenges. Outputs may become more homogenized, especially when the AI is trained on AI-generated content, potentially triggering a homogenization death spiral. And any AI bias may propagate to become societal bias. A solution to the homogenization and bias issues is to reduce human-AI interaction frictions and enable users to flexibly share information, leading to personalized outputs without sacrificing productivity.</div>
+        </details>
+      </article>
+
+      <article class="paper" itemscope itemtype="https://schema.org/ScholarlyArticle">
+        <div class="title-row">
+          <h3 class="title" itemprop="headline">Optimal Design of Default Donations</h3>
+          <div class="links">
+            <a class="btn" href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4733483" itemprop="url">Paper</a>
+            </div>
+        </div>
+        <div class="meta">
+          <span class="pill" title="Status"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20l9-5-9-5-9 5 9 5z"/><path d="M12 12l9-5-9-5-9 5 9 5z"/></svg> Major Revision</span>
+          <span class="pill" title="Venue">Operations Research</span>
+        </div>
+        <div class="authors">with Scott Rodilitz</div>
+        
+        
+        <details class="abstract">
+          <summary><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg> Show abstract</summary>
+          <div class="abs-body" itemprop="description">Nonprofit fundraising websites often display a set of suggested donation amounts, allowing prospective donors to effortlessly select an amount from this menu of suggestions instead of manually inputting their ideal donation. Although this strategy is effective at shaping behavior, it can also backfire: suggested amounts attract donors with both lower and higher ideal donations, potentially leading to a net decrease in revenue. To address this challenge, we present a comprehensive framework for designing a menu of suggestions to maximize fundraising revenue in the presence of heterogeneous donors. Our analysis reveals the limitations of a greedy approach. Instead, we design an algorithm based on dynamic programming principles that efficiently finds an optimal menu. Additionally, we shed light on the value of information by comparing against a benchmark that knows the largest amount that each donor would select. If the nonprofit has information about each donor&#x27;s ideal donation, it can obtain a constant-factor guarantee with respect to this full-information benchmark. If the nonprofit only has distributional information, we characterize how the guarantee depends on donor heterogeneity and the size of the menu. Our algorithm is a readily-implementable tool for nonprofits, and our theoretical findings translate into guidelines for the design of fundraising websites: (i) market segmentation can be quite valuable, (ii) larger menus can serve as a partial substitute for segmentation, and (iii) menus that include suggested amounts below the most common donation are often suboptimal. As a case study, we apply our optimization framework to experimental data from Altmann et al. (2019). Our counterfactual analysis suggests that the optimal menu could increase revenue by more than 3%.</div>
+        </details>
+      </article>
+
+      <article class="paper" itemscope itemtype="https://schema.org/ScholarlyArticle">
+        <div class="title-row">
+          <h3 class="title" itemprop="headline">Matching Queues, Flexibility and Incentives</h3>
+          <div class="links">
+            <a class="btn" href="https://arxiv.org/abs/2006.08863" itemprop="url">Paper</a>
+            </div>
+        </div>
+        <div class="meta">
+          <span class="pill" title="Status"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20l9-5-9-5-9 5 9 5z"/><path d="M12 12l9-5-9-5-9 5 9 5z"/></svg> Major Revision</span>
+          <span class="pill" title="Venue">MSOM</span>
+        </div>
+        <div class="authors">with Peter Frazier, Hongyao Ma, Hamid Nazerzadeh, and Chiwei Yan</div>
+        
+        
+        <details class="abstract">
+          <summary><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg> Show abstract</summary>
+          <div class="abs-body" itemprop="description">Problem definition: In many matching markets, some agents are fully flexible, while others only accept a subset of jobs. Conventional wisdom suggests reserving flexible agents, but this can backfire: anticipating higher matching chances, agents may misreport as specialized, reducing overall matches. We ask how platforms can design simple matching policies that remain effective when agents act strategically. Methodology/results: We model job allocation as a matching queue and analyze equilibrium throughput performance under different policies when agents report their types. We show that flexibility reservation is optimal under full information but can perform poorly with private information, sometimes substantially worse than random assignment. To address this, we propose a new policy -- flexibility reservation with fallback -- that guarantees robust performance across settings. Managerial implications: Our results underscore the importance of accounting for strategic reporting in policy design. The proposed fallback policy combines robustness with simplicity, making it practical to implement in platforms such as ride-hailing and affordable housing allocation.</div>
+        </details>
+      </article>
+
+      <article class="paper" itemscope itemtype="https://schema.org/ScholarlyArticle">
+        <div class="title-row">
+          <h3 class="title" itemprop="headline">Randomized FIFO Mechanisms</h3>
+          <div class="links">
+            <a class="btn" href="https://arxiv.org/abs/2111.10706" itemprop="url">Paper</a>
+            <a class="btn" href="https://doi.org/10.1145/3490486.3538353">DOI</a>
+            <details class="tool media"><summary class="btn" aria-label="Media coverage"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h10l6 6v8a2 2 0 0 1-2 2z"/></svg><span>Media</span></summary><div class="dropdown"><div class="media-list"><a class="media-pill" href="https://anderson-review.ucla.edu/a-matching-mechanism-to-reduce-uber-lyft-customer-wait-improve-revenue/" rel="noopener">UCLA Anderson Review</a></div></div></details>
+            </div>
+        </div>
+        <div class="meta">
+          
+        </div>
+        <div class="authors">with Hongyao Ma, Hamid Nazerzadeh and Chiwei Yan</div>
+        
+        
+        <details class="abstract">
+          <summary><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg> Show abstract</summary>
+          <div class="abs-body" itemprop="description">We study the matching of jobs to workers in a queue, e.g. a ridesharing platform dispatching drivers to pick up riders at an airport. Under FIFO dispatching, the heterogeneity in trip earnings incentivizes drivers to cherry-pick, increasing riders&#x27; waiting time for a match and resulting in a loss of efficiency and reliability. We first present the direct FIFO mechanism, which offers lower-earning trips to drivers further down the queue. The option to skip the rest of the line incentivizes drivers to accept all dispatches, but the mechanism would be considered unfair since drivers closer to the head of the queue may have lower priority for trips to certain destinations. To avoid the use of unfair dispatch rules, we introduce a family of randomized FIFO mechanisms, which send declined trips gradually down the queue in a randomized manner. We prove that a randomized FIFO mechanism achieves the first best throughput and the second best revenue in equilibrium. Extensive counterfactual simulations using data from the City of Chicago demonstrate substantial improvements of revenue and throughput, highlighting the effectiveness of using waiting times to align incentives and reduce the variability in driver earnings.</div>
+        </details>
+      </article>
+
+      <article class="paper" itemscope itemtype="https://schema.org/ScholarlyArticle">
+        <div class="title-row">
+          <h3 class="title" itemprop="headline">Near Optimal Control in Ride Hailing Platforms with Strategic Servers</h3>
+          <div class="links">
+            <a class="btn" href="https://arxiv.org/abs/2008.03762" itemprop="url">Paper</a>
+            </div>
+        </div>
+        <div class="meta">
+          
+        </div>
+        <div class="authors">with Sushil Mahavir Varma and Siva Theja Maguluri</div>
+        
+        
+        <details class="abstract">
+          <summary><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg> Show abstract</summary>
+          <div class="abs-body" itemprop="description">Motivated by applications in online marketplaces such as ride-hailing, we study how strategic servers impact the system performance. We consider a discrete-time process in which, heterogeneous types of customers and servers arrive. Each customer joins their type&#x27;s queue, while servers might join a different type&#x27;s queue depending on the prices posted by the system operator and an inconvenience cost. Then the system operator, constrained by a compatibility graph, decides the matching. The objective is to design an optimal control (pricing and matching scheme) to maximize the profit minus the expected waiting times. We develop a general framework that enables us to analyze a broad range of strategic behaviors. In particular, we encode servers&#x27; behavior in a properly defined <em>cost function</em> that can be tailored to various settings. Using this general cost function, we introduce a novel probabilistic fluid problem. The probabilistic fluid model provides an upper bound on the achievable net profit. We then study the system under a large market regime in which the arrival rates are scaled by $\eta$ and present a probabilistic two-price policy and a max-weight matching policy which results in a net profit-loss of at most $O(\eta^{1/3})$. In addition, under a broad class of customer pricing policies, we show that any matching policy has net profit-loss of at least $\Omega(\eta^{1/3})$. To show generality of our framework, we present multiple extensions to our model and analysis. We conclude the discussion by presenting numerical simulations comparing different cost models and analyzing performance of the proposed pricing and matching policies.</div>
+        </details>
+      </article>
+      </div>
+    </section>
+
+    <section class="pub-sec" data-sec="other">
+      <h2 id="other">
+        <button class="toggle" aria-expanded="true" aria-controls="other-articles">
+          <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 9l6 6 6-6"/>
+          </svg>
+          Other Articles
+        </button>
+      </h2>
+      <div class="paper-list" id="other-articles">
+
+      <article class="paper" itemscope itemtype="https://schema.org/ScholarlyArticle">
+        <div class="title-row">
+          <h3 class="title" itemprop="headline">Does GenAI Impose a Creativity Tax?</h3>
+          <div class="links">
+            <a class="btn" href="https://sloanreview.mit.edu/article/does-genai-impose-a-creativity-tax/" itemprop="url">Article</a>
+            </div>
+        </div>
+        <div class="meta">
+          <span class="pill" title="Year"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 2025</span>
+          <span class="pill" title="Venue">MIT Sloan Management Review</span>
+        </div>
+        <div class="authors">with Jian Gao and Sébastien Martin</div>
+        
+        
+      </article>
+
+      <article class="paper" itemscope itemtype="https://schema.org/ScholarlyArticle">
+        <div class="title-row">
+          <h3 class="title" itemprop="headline">Optimal Timing of a Multi-Stage Project Under Market Uncertainty</h3>
+          <div class="links">
+            <a class="btn" href="OptTiming.pdf" itemprop="url">Paper</a>
+            </div>
+        </div>
+        <div class="meta">
+          <span class="pill" title="Venue">Technical Report</span>
+        </div>
+        <div class="authors">with René Caldentey, Rafael Epstein and Denis Saure</div>
+        
+        
+      </article>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    // Highlight current section in subnav as you scroll
+    (function(){
+      const ids = ['journal','conference','working','other'];
+      const linkFor = id => document.querySelector('.subnav a[href="#'+id+'"]');
+      const links = new Map(ids.map(id => [id, linkFor(id)]));
+      const obs = new IntersectionObserver((entries)=>{
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            links.forEach(a => a && a.classList.remove('active'));
+            const a = links.get(e.target.id);
+            if (a) a.classList.add('active');
+          }
+        });
+      }, { rootMargin: '-55% 0px -40% 0px', threshold: 0.01 });
+      ids.forEach(id => { const el = document.getElementById(id); if (el) obs.observe(el); });
+    })();
+  </script>
+  <script>
+    // Close Cite/Media dropdowns when clicking outside or pressing Esc
+    (function(){
+      function closeAllExcept(target){
+        document.querySelectorAll('.links details.tool[open]').forEach(d => {
+          if (!target || !d.contains(target)) d.removeAttribute('open');
+        });
+      }
+      document.addEventListener('click', function(e){ closeAllExcept(e.target); });
+      document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeAllExcept(null); });
+    })();
+  </script>
+  <script>
+    (function(){
+      // Media (n) badge
+      document.querySelectorAll('.links details.media').forEach(function(det){
+        var count = det.querySelectorAll('.media-list a').length;
+        var label = det.querySelector('summary span');
+        if (label) { label.textContent = count ? 'Media ('+count+')' : 'Media'; }
+      });
+
+      // Copy BibTeX button
+      document.querySelectorAll('.links details.cite').forEach(function(det){
+        var drop = det.querySelector('.dropdown'); if (!drop) return;
+        if (!drop.querySelector('.copy-row')){
+          var row = document.createElement('div'); row.className='copy-row';
+          var btn = document.createElement('button'); btn.type='button'; btn.className='copy-btn'; btn.textContent='Copy';
+          row.appendChild(btn); drop.insertBefore(row, drop.firstChild);
+          btn.addEventListener('click', function(){
+            var pre = drop.querySelector('pre'); var txt = pre ? pre.innerText : '';
+            if (navigator.clipboard && navigator.clipboard.writeText){
+              navigator.clipboard.writeText(txt).then(function(){ var prev=btn.textContent; btn.textContent='Copied!'; setTimeout(function(){ btn.textContent=prev;}, 1200); });
+            }
+          });
+        }
+      });
+
+      // Smarter overlay positioning on open
+      function positionDropdown(det){
+        det.classList.remove('align-left','full');
+        var drop = det.querySelector('.dropdown'); if (!drop) return;
+        var rect = drop.getBoundingClientRect();
+        var vw = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+        if (rect.right > vw - 8) det.classList.add('align-left');
+        if (rect.width > vw * 0.92 || vw < 500) det.classList.add('full');
+      }
+      document.querySelectorAll('.links details.tool').forEach(function(det){
+        det.addEventListener('toggle', function(){ if (det.open) positionDropdown(det); });
+      });
+      window.addEventListener('resize', function(){
+        document.querySelectorAll('.links details.tool[open]').forEach(positionDropdown);
+      });
+    })();
+  </script>
+  <script>
+    // Collapsible sections (expanded by default)
+    (function(){
+      document.querySelectorAll('.pub-sec').forEach(function(sec){
+        var btn  = sec.querySelector('h2 .toggle');
+        var list = sec.querySelector('.paper-list');
+        if (!btn || !list) return;
+
+        // Ensure expanded on load
+        sec.classList.remove('collapsed');
+        list.hidden = false;
+        btn.setAttribute('aria-expanded', 'true');
+
+        btn.addEventListener('click', function(){
+          var collapsed = sec.classList.toggle('collapsed');
+          list.hidden = collapsed;
+          btn.setAttribute('aria-expanded', String(!collapsed));
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
