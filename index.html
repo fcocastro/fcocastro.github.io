@@ -15,10 +15,14 @@
       --card:#f9fafb;           /* gray-50 */
       --radius:14px;
       --shadow: 0 1px 2px rgba(0,0,0,.06), 0 6px 18px rgba(0,0,0,.06);
-      --hero-img:url('assets/hero_1280.jpg'); /* default 1x */ /* ← replace path */
-      --profile-img:url('assets/me.jpg'); /* ← replace path */
+      --hero-img:url('assets/hero_1280.jpg'); /* default 1x */
+      --profile-img:url('assets/me.jpg');
+      /* NEW: responsive header height */
+      --header-h: 64px;
     }
-    @media (prefers-color-scheme: dark){ :root{ --text:#e5e7eb; --muted:#9ca3af; --bg:#0b1020; --card:#0f172a; --accent:#38bdf8; --shadow:0 1px 2px rgba(0,0,0,.35), 0 8px 30px rgba(0,0,0,.35); } }
+    @media (prefers-color-scheme: dark){
+      :root{ --text:#e5e7eb; --muted:#9ca3af; --bg:#0b1020; --card:#0f172a; --accent:#38bdf8; --shadow:0 1px 2px rgba(0,0,0,.35), 0 8px 30px rgba(0,0,0,.35); }
+    }
 
     /* High-DPR hero image for crispness */
     @supports (image-set(url('x') 1x)){
@@ -34,48 +38,59 @@
 
     /* Header */
     .wrap{max-width:1100px;margin:0 auto;padding:0 20px}
-    header{position:fixed;inset:0 0 auto 0;height:64px;display:flex;align-items:center;backdrop-filter:saturate(140%) blur(3px);background:rgba(255,255,255,.6);border-bottom:1px solid rgba(0,0,0,.06);z-index:10}
+    header{
+      position:fixed;inset:0 0 auto 0;
+      height:var(--header-h);                             /* was 64px */
+      display:flex;align-items:center;
+      backdrop-filter:saturate(140%) blur(3px);
+      background:rgba(255,255,255,.6);
+      border-bottom:1px solid rgba(0,0,0,.06);
+      z-index:10
+    }
     @media (prefers-color-scheme: dark){ header{background:rgba(15,23,42,.35);border-color:rgba(255,255,255,.08)} }
     .site-title{font-weight:700;letter-spacing:.2px;font-size:18px;display:none}
     nav{margin-left:auto;display:flex;gap:16px}
 
     /* Hero */
-    .hero{position:relative;min-height:78vh;display:grid;place-items:center;background:
+    .hero{
+      position:relative;min-height:78vh;display:grid;place-items:center;background:
       linear-gradient(180deg, rgba(2,6,23,.62), rgba(2,6,23,.30) 35%, rgba(2,6,23,.68)),
-      var(--hero-img) center/cover no-repeat; color:#fff}
+      var(--hero-img) center/cover no-repeat; color:#fff
+    }
     .hero::before{content:"";position:absolute;inset:0;background:radial-gradient(60% 40% at 50% 10%, rgba(255,255,255,.06), transparent 60%)}
-    .hero-inner{position:relative; padding-top:64px; /* account for fixed header */}
+    .hero-inner{position:relative; padding-top:var(--header-h); }  /* was 64px */
 
-    .profile-card{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;max-width:880px;margin:0 auto;padding:8px 0;border-radius:var(--radius);box-shadow:none;background:transparent}
+    .profile-card{
+      display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;
+      max-width:880px;margin:0 auto;padding:8px 0;border-radius:var(--radius);box-shadow:none;background:transparent
+    }
     @media (prefers-color-scheme: dark){
       .profile-card{background:transparent}
     }
 
-/* default (phones) */
-.avatar{
-  width:16px; height:160px;           /* was 120 */
-  border-radius:999px; object-fit:cover;
-  border:2px solid rgba(255,255,255,.95);
-  background:var(--profile-img) center/cover no-repeat;
-}
-.avatar img{display:none}
+    /* default (phones baseline) */
+    .avatar{
+      width:160px; height:160px; /* bigger and square for density */
+      border-radius:999px; object-fit:cover;
+      border:2px solid rgba(255,255,255,.95);
+      background:var(--profile-img) center/cover no-repeat;
+    }
+    .avatar img{display:none}
 
-/* tablets / small laptops */
-@media (min-width: 640px){
-  .avatar{ width:180px; height:180px; } /* was 140 */
-}
+    /* tablets / small laptops */
+    @media (min-width: 640px){
+      .avatar{ width:180px; height:180px; }
+    }
 
-/* larger laptops / desktops */
-@media (min-width: 1024px){
-  .avatar{ width:230px; height:230px; } /* was 170 */
-}
+    /* larger laptops / desktops */
+    @media (min-width: 1024px){
+      .avatar{ width:230px; height:230px; }
+    }
 
-/* very large screens */
-@media (min-width: 1440px){
-  .avatar{ width:250px; height:250px; } /* was 190 */
-}
-
-
+    /* very large screens */
+    @media (min-width: 1440px){
+      .avatar{ width:250px; height:250px; }
+    }
 
     .name{margin:0;font-size:24px;font-weight:800;line-height:1.15}
     .tag{margin:2px 0 8px;color:var(--muted)}
@@ -103,6 +118,29 @@
     .card{background:var(--card);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow)}
 
     footer{margin:40px 0;color:var(--muted);font-size:13px}
+
+    /* —— Mobile-friendly layout & hero focal point —— */
+    @media (max-width: 640px){
+      :root{ --header-h: 56px; }                 /* slightly shorter header on phones */
+      .wrap{ padding: 0 16px; }
+      .hero{
+        min-height:70vh;
+        background-position: 50% 30%;            /* keeps the interesting part in view */
+      }
+      .profile-card{
+        grid-template-columns: 1fr;              /* stack avatar above text */
+        text-align: center;
+        gap: 14px;
+      }
+      .avatar{
+        width:140px; height:140px;
+        margin: 0 auto 8px;
+      }
+      .name{ font-size: 22px; line-height: 1.2; }
+      .tag, .intro{ font-size: 15px; }
+      .cta{ justify-content: center; gap: 8px; }
+      .btn{ padding: 10px 14px; font-size: 15px; } /* bigger tap targets */
+    }
   </style>
 </head>
 <body>
@@ -129,8 +167,9 @@
             I'm an assistant professor at the UCLA Anderson School of Management. 
             I study operational and economic questions at the intersection of operations management, market design, and AI.
             <!-- I'm particularly interested in the design of optimal pricing policies and contracts that can be used in digital marketplaces such as ride-hailing platforms and ad exchanges.-->
-            My current work explores <em>electric vehicle fleets</em>, <em>non‑profit pricing & defaults</em>, and <em>how AI is reshaping the way we think about business</em>.
-            I am a graduate of University of Chile and received my Ph.D. from Columbia University's Graduate School of Business in 2019. Before joining UCLA, I was a Post-doctoral research scientist at Uber. </p>
+            My current work explores <em>electric vehicle fleets</em>, <em>non-profit pricing & defaults</em>, and <em>how AI is reshaping the way we think about business</em>.
+            I am a graduate of University of Chile and received my Ph.D. from Columbia University's Graduate School of Business in 2019. Before joining UCLA, I was a Post-doctoral research scientist at Uber.
+          </p>
           <div class="cta">
             <a class="btn" href="./publications.html">See publications</a>
             <a class="btn" href="https://scholar.google.com/citations?user=09_uzi8AAAAJ&hl=en&oi=ao" rel="me noopener">Google Scholar</a>
